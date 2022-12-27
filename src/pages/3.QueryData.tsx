@@ -11,18 +11,22 @@ import { queryClient } from "../queryClient";
  */
 
 const UserListWithEnableQuery: FC = () => {
-  const { data: users } = useGetUsersQuery();
-  const { mutate } = useAddUserMutation();
+  const { data: users, refetch: refetchUsers } = useGetUsersQuery({
+    refetchOnWindowFocus: false,
+  });
+
+  const { mutateAsync } = useAddUserMutation();
 
   return (
     <div>
       <h1>유저 목록 (enable query)</h1>
       <button
-        onClick={() => {
+        onClick={async () => {
           const userName = window.prompt("User Name");
 
           if (userName) {
-            mutate(userName);
+            await mutateAsync(userName);
+            refetchUsers();
           }
         }}
       >
@@ -34,7 +38,10 @@ const UserListWithEnableQuery: FC = () => {
 };
 
 const UserListWithDisableQuery: FC = () => {
-  const { data: users } = useGetUsersQuery({ enabled: false });
+  const { data: users } = useGetUsersQuery({
+    enabled: false,
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <div>
@@ -68,7 +75,7 @@ const QueryData: FC = () => {
 
   return (
     <div>
-      {/* <UserListWithEnableQuery /> */}
+      <UserListWithEnableQuery />
       <UserListWithDisableQuery />
       <UserListWithQueryCache />
       {/* {isLoaded && <UserListWithQueryCache />} */}
